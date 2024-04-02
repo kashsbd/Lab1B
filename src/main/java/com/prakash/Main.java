@@ -1,19 +1,27 @@
-package org.example;
+package com.prakash;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import com.prakash.model.Employee;
+import com.prakash.model.PensionPlan;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class Main {
-    public static void main(String[] args) {
-        // Press Opt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+    public static void main(String args[]) {
+        var pensionPlanOne = new PensionPlan("EX1089", LocalDate.of(2023, 1, 17), 100.0);
+        var pensionPlanTwo = new PensionPlan("SM2307", LocalDate.of(2019, 11, 4), 1555.0);
 
-        // Press Ctrl+R or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        Employee employees[] = {
+                new Employee(11111111111L, "Daniel", "Agar", LocalDate.of(2018, 1, 17), 105945.50, pensionPlanOne),
+                new Employee(11111111112L, "Benard", "Shaw", LocalDate.of(2019, 4, 3), 197750.00, null),
+                new Employee(11111111113L, "Carly", "Agar", LocalDate.of(2014, 5, 16), 842000.75, pensionPlanTwo),
+                new Employee(11111111114L, "Wesley", "Schneider", LocalDate.of(2019, 5, 2), 74500.00, null),
+        };
 
-            // Press Ctrl+D to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Cmd+F8.
-            System.out.println("i = " + i);
-        }
+        var sortedEmployees = Arrays.stream(employees)
+                .sorted(Comparator.comparing(Employee::lastName).thenComparing(Employee::yearlySalary, Comparator.reverseOrder())).toList();
+
+        System.out.println(sortedEmployees);
     }
 }
