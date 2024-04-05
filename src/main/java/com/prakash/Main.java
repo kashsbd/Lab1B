@@ -4,24 +4,55 @@ import com.prakash.model.Employee;
 import com.prakash.model.PensionPlan;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.time.Period;
+import java.time.YearMonth;
+import java.util.*;
+
+import com.google.gson.Gson;
 
 public class Main {
-    public static void main(String args[]) {
-        var pensionPlanOne = new PensionPlan("EX1089", LocalDate.of(2023, 1, 17), 100.0);
-        var pensionPlanTwo = new PensionPlan("SM2307", LocalDate.of(2019, 11, 4), 1555.0);
-
-        Employee employees[] = {
-                new Employee(11111111111L, "Daniel", "Agar", LocalDate.of(2018, 1, 17), 105945.50, pensionPlanOne),
-                new Employee(11111111112L, "Benard", "Shaw", LocalDate.of(2019, 4, 3), 197750.00, null),
-                new Employee(11111111113L, "Carly", "Agar", LocalDate.of(2014, 5, 16), 842000.75, pensionPlanTwo),
-                new Employee(11111111114L, "Wesley", "Schneider", LocalDate.of(2019, 5, 2), 74500.00, null),
-        };
-
-        var sortedEmployees = Arrays.stream(employees)
-                .sorted(Comparator.comparing(Employee::lastName).thenComparing(Employee::yearlySalary, Comparator.reverseOrder())).toList();
-
-        System.out.println(sortedEmployees);
-    }
+        //Feature 1
+        private static String employeesJSON(List<Employee> employees){
+            employees.sort(
+                    Comparator.comparing(Employee::getLastName)
+                            .thenComparing(Employee::getYearlySalary).reversed()
+            );
+            return new Gson().toJson(employees);
+        }
+    
+        private static String enrolleeReport(List<Employee> employees){
+            List<Employee> employeewWhoQualifiedPension = new ArrayList<>();
+    
+            employees.forEach(employee -> {
+                String employmentDate = employee.getEmploymentDate();
+                LocalDate empdate = LocalDate.parse(employmentDate);
+    
+                LocalDate today = LocalDate.now();
+                YearMonth nextMonth = YearMonth.from(today).plusMonths(1);
+                LocalDate endOfMonth = nextMonth.atEndOfMonth();
+    
+                Period period = Period.between(empdate,endOfMonth);
+    
+                if (period.getYears() >= 5){
+                    employeewWhoQualifiedPension.add(employee);
+                }
+            });
+    
+            employeewWhoQualifiedPension.sort(Comparator.comparing(Employee::getEmploymentDate));
+    
+            return new Gson().toJson(employeewWhoQualifiedPension);
+        }
+    
+        public static void main(String[] args) {
+            List<Employee> employees = new ArrayList<>();
+            employees.add(new Employee(1L, "Daniel", "Agar", "2018-01-17", 105945.50, new PensionPlan("EX1089", "2023-01-17", 100.0)));
+            employees.add(new Employee(2L, "Bernard", "Shaw", "2018-10-03", 197750.00, new PensionPlan(null, null, null)));
+            employees.add(new Employee(3L, "Carly", "Agar", "2014-05-16", 842000.75, new PensionPlan("SM2307", "2019-11-04", 1555.50)));
+            employees.add(new Employee(4L, "Wesley", "Schneider", "2018-11-02", 74500.00, new PensionPlan(null, null, null)));
+    
+            System.out.println("List of All Employees: ");
+            System.out.println(employeesJSON(employees));
+            System.out.println("Monthly Upcoming Enrollees: ");
+            System.out.println(enrolleeReport(employees));
+        }
 }
